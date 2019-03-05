@@ -226,7 +226,7 @@ function form_set_cache($form_build_id, $form, $form_state) {
   if ($user->uid) {
     $form['#cache_token'] = drupal_get_token();
   }
-  elseif (variable_get('cache', CACHE_DISABLED) != CACHE_DISABLED && $_SERVER['REQUEST_METHOD'] == 'GET' && page_get_cache(TRUE)) {
+  elseif (variable_get('cache', CACHE_DISABLED) != CACHE_DISABLED && drupal_page_is_cacheable()) {
     $form['#immutable'] = TRUE;
   }
   $form_build_id_old = $form_build_id;
@@ -1932,7 +1932,7 @@ function form_expand_ahah($element) {
     );
 
     // If page caching is active, indicate that this form is immutable.
-    if (variable_get('cache', CACHE_DISABLED) != CACHE_DISABLED && !$user->uid && $_SERVER['REQUEST_METHOD'] == 'GET' && page_get_cache(TRUE)) {
+    if (variable_get('cache', CACHE_DISABLED) != CACHE_DISABLED && !$user->uid && drupal_page_is_cacheable()) {
       $ahah_binding['immutable'] = TRUE;
     }
 
@@ -2095,7 +2095,7 @@ function theme_image_button($element) {
     (!empty($element['#value']) ? ('value="'. check_plain($element['#value']) .'" ') : '') .
     'id="'. $element['#id'] .'" '.
     drupal_attributes($element['#attributes']) .
-    ' src="'. base_path() . $element['#src'] .'" '.
+    ' src="'. file_create_url($element['#src']) .'" '.
     (!empty($element['#title']) ? 'alt="'. check_plain($element['#title']) .'" title="'. check_plain($element['#title']) .'" ' : '' ) .
     "/>\n";
 }
