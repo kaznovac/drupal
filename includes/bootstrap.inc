@@ -231,7 +231,7 @@ if (defined('E_DEPRECATED')) {
  * the same timer multiple times, the measured intervals will be
  * accumulated.
  *
- * @param name
+ * @param $name
  *   The name of the timer.
  */
 function timer_start($name) {
@@ -245,7 +245,7 @@ function timer_start($name) {
 /**
  * Read the current timer value without stopping the timer.
  *
- * @param name
+ * @param $name
  *   The name of the timer.
  * @return
  *   The current timer value in ms.
@@ -268,7 +268,7 @@ function timer_read($name) {
 /**
  * Stop the timer with the specified name.
  *
- * @param name
+ * @param $name
  *   The name of the timer.
  * @return
  *   A timer array. The array contains the number of times the
@@ -318,7 +318,7 @@ function timer_stop($name) {
  *   will be recognized. Defaults to TRUE. During initial installation,
  *   this is set to FALSE so that Drupal can detect a matching directory,
  *   then create a new settings.php file in it.
- * @param reset
+ * @param $reset
  *   Force a full search for matching directories even if one had been
  *   found previously.
  * @return
@@ -617,7 +617,7 @@ function variable_init($conf = array(), $regenerate = FALSE, $recursion_depth = 
  *   The name of the variable to return.
  * @param $default
  *   The default value to use if this variable has never been set.
- * @return
+ * @return mixed
  *   The value of the variable.
  *
  * @see variable_del(), variable_set()
@@ -1691,8 +1691,10 @@ function drupal_init_language() {
 /**
  * Get a list of languages set up indexed by the specified key
  *
- * @param $field The field to index the list with.
- * @param $reset Boolean to request a reset of the list.
+ * @param $field
+ *   The field to index the list with.
+ * @param $reset
+ *   Boolean to request a reset of the list.
  */
 function language_list($field = 'language', $reset = FALSE) {
   static $languages = NULL;
