@@ -385,8 +385,13 @@ function _menu_load_objects(&$item, &$map) {
           // 'load arguments' in the hook_menu() entry, but they need
           // some processing. In this case the $function is the key to the
           // load_function array, and the value is the list of arguments.
-          list($function, $args) = each($function);
-          $load_functions[$index] = $function;
+
+          // emulate deprecated each: list($function, $args) = each($function);
+          $func = key($function);
+          $args = current($function);
+          next($function);
+
+          $load_functions[$index] = $func;
 
           // Some arguments are placeholders for dynamic items to process.
           foreach ($args as $i => $arg) {
@@ -406,7 +411,7 @@ function _menu_load_objects(&$item, &$map) {
             }
           }
           array_unshift($args, $value);
-          $return = call_user_func_array($function, $args);
+          $return = call_user_func_array($func, $args);
         }
         else {
           $return = $function($value);
@@ -1538,45 +1543,33 @@ function menu_set_active_trail($new_trail = NULL) {
     $trail[] = array('title' => t('Home'), 'href' => '<front>', 'localized_options' => array(), 'type' => 0);
     $item = menu_get_item();
 
-    // Check whether the current item is a local task (displayed as a tab).
-    if ($item['tab_parent']) {
-      // The title of a local task is used for the tab, never the page title.
-      // Thus, replace it with the item corresponding to the root path to get
-      // the relevant href and title.  For example, the menu item corresponding
-      // to 'admin' is used when on the 'By module' tab at 'admin/by-module'.
-      $parts = explode('/', $item['tab_root']);
-      $args = arg();
-      // Replace wildcards in the root path using the current path.
-      foreach ($parts as $index => $part) {
-        if ($part == '%') {
-          $parts[$index] = $args[$index];
+    if ($item) {
+      // Check whether the current item is a local task (displayed as a tab).
+      if ($item['tab_parent']) {
+        // The title of a local task is used for the tab, never the page title.
+        // Thus, replace it with the item corresponding to the root path to get
+        // the relevant href and title.  For example, the menu item corresponding
+        // to 'admin' is used when on the 'By module' tab at 'admin/by-module'.
+        $parts = explode('/', $item['tab_root']);
+        $args = arg();
+        // Replace wildcards in the root path using the current path.
+        foreach ($parts as $index => $part) {
+          if ($part == '%') {
+            $parts[$index] = $args[$index];
+          }
+        }
+        // Retrieve the menu item using the root path after wildcard replacement.
+        $root_item = menu_get_item(implode('/', $parts));
+        if ($root_item && $root_item['access']) {
+          $item = $root_item;
         }
       }
-      // Retrieve the menu item using the root path after wildcard replacement.
-      $root_item = menu_get_item(implode('/', $parts));
-      if ($root_item && $root_item['access']) {
-        $item = $root_item;
-      }
+
+      $tree = menu_tree_page_data(menu_get_active_menu_name());
+
+      _menu_tree_build_trail($tree, $item, $trail);
     }
 
-    $tree = menu_tree_page_data(menu_get_active_menu_name());
-    list($key, $curr) = each($tree);
-
-    while ($curr) {
-      // Terminate the loop when we find the current path in the active trail.
-      if ($curr['link']['href'] == $item['href']) {
-        $trail[] = $curr['link'];
-        $curr = FALSE;
-      }
-      else {
-        // Add the link if it's in the active trail, then move to the link below.
-        if ($curr['link']['in_active_trail']) {
-          $trail[] = $curr['link'];
-          $tree = $curr['below'] ? $curr['below'] : array();
-        }
-        list($key, $curr) = each($tree);
-      }
-    }
     // Make sure the current page is in the trail (needed for the page title),
     // but exclude tabs and the front page.
     $last = count($trail) - 1;
@@ -1585,6 +1578,29 @@ function menu_set_active_trail($new_trail = NULL) {
     }
   }
   return $trail;
+}
+
+/**
+ * Create active trail to item
+ */
+function _menu_tree_build_trail(array $tree, array $item, array &$trail) {
+  foreach ($tree as $curr) {
+    // Terminate the loop when we find the current path in the active trail.
+    if ($curr['link']['href'] == $item['href']) {
+      $trail[] = $curr['link'];
+      break;
+    }
+    else {
+      // Add the link if it's in the active trail, then move to the link below.
+      if ($curr['link']['in_active_trail']) {
+        $trail[] = $curr['link'];
+        if ($curr['below']) {
+          _menu_tree_build_trail($curr['below'], $item, $trail);
+          break;
+        }
+      }
+    }
+  }
 }
 
 /**
