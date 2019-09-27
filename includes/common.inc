@@ -3950,9 +3950,10 @@ function _drupal_exception_handler($exception) {
 /**
  * Decode an exception, especially to retrive the correct caller.
  *
- * @param $exception
+ * @param $exception \Exception
  *   The exception object that was thrown.
- * @return An error in the format expected by _drupal_log_error().
+ * @return
+ *   An error in the format expected by _drupal_log_error().
  */
 function _drupal_decode_exception($exception) {
   $message = $exception->getMessage();

@@ -193,7 +193,8 @@ class SimpleTestFunctionalTest extends DrupalWebTestCase {
    * @param string $status Assertion status.
    * @param string $file File where the assertion originated.
    * @param string $functuion Function where the assertion originated.
-   * @return Assertion result.
+   * @return
+   *   Assertion result.
    */
   function assertAssertion($message, $type, $status, $file, $function) {
     $message = trim(strip_tags($message));
@@ -244,7 +245,8 @@ class SimpleTestFunctionalTest extends DrupalWebTestCase {
   /**
    * Get the fieldset containing the results for group this test is in.
    *
-   * @return fieldset containing the results for group this test is in.
+   * @return
+   *   fieldset containing the results for group this test is in.
    */
   function getResultFieldSet() {
     $fieldsets = $this->xpath('//fieldset');
@@ -275,7 +277,8 @@ class SimpleTestFunctionalTest extends DrupalWebTestCase {
   /**
    * Check if the test is being run from inside a CURL request.
    *
-   * @return The test is being run from inside a CURL request.
+   * @return
+   *   The test is being run from inside a CURL request.
    */
   function inCURL() {
     return isset($_SERVER['HTTP_USER_AGENT']) && preg_match("/^simpletest\d+/", $_SERVER['HTTP_USER_AGENT']);
