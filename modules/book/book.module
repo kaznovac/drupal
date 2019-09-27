@@ -545,12 +545,15 @@ function book_prev($book_link) {
     return NULL;
   }
   $flat = book_get_flat_menu($book_link);
-  // Assigning the array to $flat resets the array pointer for use with each().
-  $curr = NULL;
-  do {
+
+  $key = null;
+  $prev = null;
+  foreach ($flat as $key => $curr) {
+    if ($key == $book_link['mlid']) {
+      break;
+    }
     $prev = $curr;
-    list($key, $curr) = each($flat);
-  } while ($key && $key != $book_link['mlid']);
+  }
 
   if ($key == $book_link['mlid']) {
     // The previous page in the book may be a child of the previous visible link.
@@ -568,6 +571,8 @@ function book_prev($book_link) {
       return $prev;
     }
   }
+
+  return null;
 }
 
 /**
@@ -575,13 +580,16 @@ function book_prev($book_link) {
  */
 function book_next($book_link) {
   $flat = book_get_flat_menu($book_link);
-  // Assigning the array to $flat resets the array pointer for use with each().
-  do {
-    list($key, $curr) = each($flat);
-  } while ($key && $key != $book_link['mlid']);
-  if ($key == $book_link['mlid']) {
-    return current($flat);
+
+  $found = false;
+  foreach ($flat as $key => $curr) {
+    if ($found) {
+      return $curr;
+    }
+    $found = $key == $book_link['mlid'];
   }
+
+  return null;
 }
 
 /**
