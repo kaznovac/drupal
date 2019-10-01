@@ -1324,7 +1324,7 @@ function system_performance_settings() {
     '#title' => t('Page cache maximum age'),
     '#default_value' => variable_get('page_cache_max_age', 0),
     '#options' => $period,
-    '#description' => t('Internal and external page caches will not deliver cached paged older than this setting.')
+    '#description' => t('Internal and external page caches will not deliver cached pages older than this setting.')
   );
   $form['page_cache']['page_compression'] = array(
     '#type' => 'radios',
